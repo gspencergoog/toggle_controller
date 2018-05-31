@@ -13,9 +13,7 @@ class ToggleController<T> extends StatefulWidget {
 
   static T getSharedValue<T>(BuildContext context) {
     assert(context != null);
-    // ignore: prefer_const_constructors
-    final Type type = new _ToggleControllerScope<T>._type().runtimeType;
-    final _ToggleControllerScope<T> controllerScope = context.inheritFromWidgetOfExactType(type);
+    final _ToggleControllerScope controllerScope = context.inheritFromWidgetOfExactType(_ToggleControllerScope);
     return controllerScope?.value;
   }
 
@@ -52,22 +50,19 @@ class _ToggleControllerState<T> extends State<ToggleController<T>> {
 
   @override
   Widget build(BuildContext context) {
-    return new _ToggleControllerScope<T>(value: _sharedValue, child: widget.child);
+    return new _ToggleControllerScope(value: _sharedValue, child: widget.child);
   }
 }
 
-class _ToggleControllerScope<T> extends InheritedWidget {
+class _ToggleControllerScope extends InheritedWidget {
   const _ToggleControllerScope({Key key, Widget child, this.value}) : super(key: key, child: child);
 
-  // This is only used to get the runtime type of the generic so we can search for it.
-  const _ToggleControllerScope._type() : value = null;
-
-  final T value;
+  final dynamic value;
 
   @override
   bool updateShouldNotify(InheritedWidget oldWidget) {
     assert(runtimeType == oldWidget.runtimeType);
-    final _ToggleControllerScope<T> oldScope = oldWidget;
+    final _ToggleControllerScope oldScope = oldWidget;
     return value != oldScope.value;
   }
 }

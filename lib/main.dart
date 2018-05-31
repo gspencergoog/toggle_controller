@@ -40,26 +40,47 @@ class _MyHomePageState extends State<MyHomePage> {
     return Container(
       alignment: Alignment.center,
       color: const Color(0xff808080),
-      child: new ToggleController<ToggleState>(
-        initialValue: ToggleState.go,
-        child: new Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: const <Widget>[
-            const ExampleToggleButton(ToggleState.happy),
-            const ExampleToggleButton(ToggleState.go),
-            const ExampleToggleButton(ToggleState.lucky),
-          ],
-        ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          new ToggleController<ToggleState>(
+            initialValue: ToggleState.go,
+            child: new Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: const <Widget>[
+                const ExampleToggleButton(ToggleState.happy),
+                const ExampleToggleButton(ToggleState.go),
+                const ExampleToggleButton(ToggleState.lucky),
+                const ExampleToggleButton(ToggleState.radio),
+                const ExampleToggleButton(ToggleState.buttons),
+              ],
+            ),
+          ),
+          new ToggleController<List<ToggleState>>(
+            initialValue: const <ToggleState>[ToggleState.radio],
+            child: new Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: const <Widget>[
+                const ExampleOnlyTwoButton(ToggleState.happy),
+                const ExampleOnlyTwoButton(ToggleState.go),
+                const ExampleOnlyTwoButton(ToggleState.lucky),
+                const ExampleOnlyTwoButton(ToggleState.radio),
+                const ExampleOnlyTwoButton(ToggleState.buttons),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
 }
 
-
 enum ToggleState {
   happy,
   go,
   lucky,
+  radio,
+  buttons,
 }
 
 class ExampleToggleButton extends StatelessWidget {
@@ -72,8 +93,8 @@ class ExampleToggleButton extends StatelessWidget {
     final ToggleState toggleState = ToggleController.getSharedValue<ToggleState>(context);
     final bool isSelected = toggleState == selectState;
     final TextStyle textSyle = DefaultTextStyle.of(context).style.copyWith(
-      color: isSelected ? const Color(0xffffffff) : const Color(0xff000000),
-    );
+          color: isSelected ? const Color(0xffffffff) : const Color(0xff000000),
+        );
     Widget button = new Container(
       width: 50.0,
       height: 50.0,
@@ -85,14 +106,55 @@ class ExampleToggleButton extends StatelessWidget {
       child: new Text(describeEnum(selectState), style: textSyle),
     );
 
-    if (!isSelected) {
-      button = GestureDetector(
-        onTap: () {
-          ToggleController.setSharedValue<ToggleState>(context, selectState);
-        },
-        child: button,
-      );
-    }
+    button = GestureDetector(
+      onTap: () {
+        ToggleController.setSharedValue<ToggleState>(context, isSelected ? null : selectState);
+      },
+      child: button,
+    );
+    return new Padding(padding: const EdgeInsets.all(8.0), child: button);
+  }
+}
+
+class ExampleOnlyTwoButton extends StatelessWidget {
+  const ExampleOnlyTwoButton(this.selectState);
+
+  final ToggleState selectState;
+
+  @override
+  Widget build(BuildContext context) {
+    final List<ToggleState> toggleState = ToggleController.getSharedValue<List<ToggleState>>(context).sublist(0);
+    final bool isSelected = toggleState.contains(selectState);
+    final TextStyle textSyle = DefaultTextStyle.of(context).style.copyWith(
+          color: isSelected ? const Color(0xffffffff) : const Color(0xff000000),
+        );
+    Widget button = new Container(
+      width: 50.0,
+      height: 50.0,
+      decoration: new ShapeDecoration(
+        shape: const StadiumBorder(),
+        color: isSelected ? const Color(0xff408040) : const Color(0xffff8080),
+      ),
+      alignment: Alignment.center,
+      child: new Text(describeEnum(selectState), style: textSyle),
+    );
+
+    button = GestureDetector(
+      onTap: () {
+        List<ToggleState> newList;
+        if (isSelected) {
+          newList = toggleState.where((ToggleState state) => state != selectState).toList();
+        } else {
+          if (toggleState.isNotEmpty) {
+            newList = <ToggleState>[toggleState.last, selectState];
+          } else {
+            newList = <ToggleState>[selectState];
+          }
+        }
+        ToggleController.setSharedValue<List<ToggleState>>(context, newList);
+      },
+      child: button,
+    );
     return new Padding(padding: const EdgeInsets.all(8.0), child: button);
   }
 }
