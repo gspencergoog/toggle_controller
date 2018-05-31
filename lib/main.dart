@@ -69,7 +69,7 @@ class ExampleToggleButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ToggleState toggleState = ToggleController.getToggleState<ToggleState>(context);
+    final ToggleState toggleState = ToggleController.getSharedValue<ToggleState>(context);
     final bool isSelected = toggleState == selectState;
     final TextStyle textSyle = DefaultTextStyle.of(context).style.copyWith(
       color: isSelected ? const Color(0xffffffff) : const Color(0xff000000),
@@ -88,7 +88,7 @@ class ExampleToggleButton extends StatelessWidget {
     if (!isSelected) {
       button = GestureDetector(
         onTap: () {
-          ToggleController.setToggleState<ToggleState>(context, selectState);
+          ToggleController.setSharedValue<ToggleState>(context, selectState);
         },
         child: button,
       );

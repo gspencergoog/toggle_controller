@@ -11,7 +11,7 @@ class ToggleController<T> extends StatefulWidget {
   final Widget child;
   final T initialValue;
 
-  static T getToggleState<T>(BuildContext context) {
+  static T getSharedValue<T>(BuildContext context) {
     assert(context != null);
     // ignore: prefer_const_constructors
     final Type type = new _ToggleControllerScope<T>._type().runtimeType;
@@ -19,7 +19,7 @@ class ToggleController<T> extends StatefulWidget {
     return controllerScope?.value;
   }
 
-  static void setToggleState<T>(BuildContext context, T value) {
+  static void setSharedValue<T>(BuildContext context, T value) {
     // ignore: prefer_const_constructors
     final _ToggleControllerState<T> controllerState = context.ancestorStateOfType(new TypeMatcher<_ToggleControllerState<T>>());
     assert(controllerState != null);
