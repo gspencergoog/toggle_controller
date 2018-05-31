@@ -5,7 +5,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 
-import 'toggle_controller.dart';
+import 'shared_state.dart';
 
 void main() => runApp(new MyApp());
 
@@ -35,6 +35,39 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  ToggleState _sharedState = ToggleState.go;
+  ToggleState get sharedState => _sharedState;
+  set sharedState(ToggleState state) {
+    if (state == _sharedState) {
+      return;
+    }
+    setState(() {
+      _sharedState = state;
+    });
+  }
+
+  ToggleState _sharedAnimatedState = ToggleState.go;
+  ToggleState get sharedAnimatedState => _sharedAnimatedState;
+  set sharedAnimatedState(ToggleState state) {
+    if (state == _sharedAnimatedState) {
+      return;
+    }
+    setState(() {
+      _sharedAnimatedState = state;
+    });
+  }
+
+  List<ToggleState> _sharedStateList = const <ToggleState>[ToggleState.happy, ToggleState.radio];
+  List<ToggleState> get sharedStateList => _sharedStateList;
+  set sharedStateList(List<ToggleState> state) {
+    if (state == _sharedStateList) {
+      return;
+    }
+    setState(() {
+      _sharedStateList = state;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -43,21 +76,11 @@ class _MyHomePageState extends State<MyHomePage> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
-          new ToggleController<ToggleState>(
-            initialValue: ToggleState.go,
-            child: new Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: const <Widget>[
-                const ExampleAnimatedButton(ToggleState.happy),
-                const ExampleAnimatedButton(ToggleState.go),
-                const ExampleAnimatedButton(ToggleState.lucky),
-                const ExampleAnimatedButton(ToggleState.radio),
-                const ExampleAnimatedButton(ToggleState.buttons),
-              ],
-            ),
-          ),
-          new ToggleController<ToggleState>(
-            initialValue: ToggleState.go,
+          new SharedState<ToggleState>(
+            value: sharedState,
+            valueChanged: (ToggleState state) {
+              sharedState = state;
+            },
             child: new Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: const <Widget>[
@@ -69,8 +92,27 @@ class _MyHomePageState extends State<MyHomePage> {
               ],
             ),
           ),
-          new ToggleController<List<ToggleState>>(
-            initialValue: const <ToggleState>[ToggleState.happy, ToggleState.radio],
+          new SharedState<ToggleState>(
+            value: sharedAnimatedState,
+            valueChanged: (ToggleState state) {
+              sharedAnimatedState = state;
+            },
+            child: new Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: const <Widget>[
+                const ExampleAnimatedButton(ToggleState.happy),
+                const ExampleAnimatedButton(ToggleState.go),
+                const ExampleAnimatedButton(ToggleState.lucky),
+                const ExampleAnimatedButton(ToggleState.radio),
+                const ExampleAnimatedButton(ToggleState.buttons),
+              ],
+            ),
+          ),
+          new SharedState<List<ToggleState>>(
+            value: sharedStateList,
+            valueChanged: (List<ToggleState> state) {
+              sharedStateList = state;
+            },
             child: new Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: const <Widget>[
@@ -103,7 +145,7 @@ class ExampleToggleButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ToggleState toggleState = ToggleController.getSharedValue<ToggleState>(context);
+    final ToggleState toggleState = SharedState.getSharedState<ToggleState>(context);
     final bool isSelected = toggleState == selectState;
     final TextStyle textSyle = DefaultTextStyle.of(context).style.copyWith(
           color: isSelected ? const Color(0xffffffff) : const Color(0xff000000),
@@ -121,7 +163,7 @@ class ExampleToggleButton extends StatelessWidget {
 
     button = GestureDetector(
       onTap: () {
-        ToggleController.setSharedValue<ToggleState>(context, isSelected ? null : selectState);
+        SharedState.setSharedState<ToggleState>(context, isSelected ? null : selectState);
       },
       child: button,
     );
@@ -145,7 +187,7 @@ class ExampleAnimatedButtonState extends State<ExampleAnimatedButton> with Ticke
 
   @override
   Widget build(BuildContext context) {
-    final ToggleState toggleState = ToggleController.getSharedValue<ToggleState>(context);
+    final ToggleState toggleState = SharedState.getSharedState<ToggleState>(context);
     final bool isSelected = toggleState == widget.selectState;
     if (isSelected) {
       controller.reverse();
@@ -168,7 +210,7 @@ class ExampleAnimatedButtonState extends State<ExampleAnimatedButton> with Ticke
 
     button = GestureDetector(
       onTap: () {
-        ToggleController.setSharedValue<ToggleState>(context, isSelected ? null : widget.selectState);
+        SharedState.setSharedState<ToggleState>(context, isSelected ? null : widget.selectState);
       },
       child: button,
     );
@@ -187,6 +229,7 @@ class ExampleAnimatedButtonState extends State<ExampleAnimatedButton> with Ticke
   @override
   void dispose() {
     controller.dispose();
+    super.dispose();
   }
 }
 
@@ -197,7 +240,7 @@ class ExampleOnlyTwoButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final List<ToggleState> toggleState = ToggleController.getSharedValue<List<ToggleState>>(context).sublist(0);
+    final List<ToggleState> toggleState = SharedState.getSharedState<List<ToggleState>>(context).sublist(0);
     final bool isSelected = toggleState.contains(selectState);
     final TextStyle textSyle = DefaultTextStyle.of(context).style.copyWith(
           color: isSelected ? const Color(0xffffffff) : const Color(0xff000000),
@@ -225,7 +268,7 @@ class ExampleOnlyTwoButton extends StatelessWidget {
             newList = <ToggleState>[selectState];
           }
         }
-        ToggleController.setSharedValue<List<ToggleState>>(context, newList);
+        SharedState.setSharedState<List<ToggleState>>(context, newList);
       },
       child: button,
     );
