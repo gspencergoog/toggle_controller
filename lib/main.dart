@@ -48,6 +48,19 @@ class _MyHomePageState extends State<MyHomePage> {
             child: new Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: const <Widget>[
+                const ExampleAnimatedButton(ToggleState.happy),
+                const ExampleAnimatedButton(ToggleState.go),
+                const ExampleAnimatedButton(ToggleState.lucky),
+                const ExampleAnimatedButton(ToggleState.radio),
+                const ExampleAnimatedButton(ToggleState.buttons),
+              ],
+            ),
+          ),
+          new ToggleController<ToggleState>(
+            initialValue: ToggleState.go,
+            child: new Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: const <Widget>[
                 const ExampleToggleButton(ToggleState.happy),
                 const ExampleToggleButton(ToggleState.go),
                 const ExampleToggleButton(ToggleState.lucky),
@@ -57,7 +70,7 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
           ),
           new ToggleController<List<ToggleState>>(
-            initialValue: const <ToggleState>[ToggleState.radio],
+            initialValue: const <ToggleState>[ToggleState.happy, ToggleState.radio],
             child: new Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: const <Widget>[
@@ -113,6 +126,67 @@ class ExampleToggleButton extends StatelessWidget {
       child: button,
     );
     return new Padding(padding: const EdgeInsets.all(8.0), child: button);
+  }
+}
+
+class ExampleAnimatedButton extends StatefulWidget {
+  const ExampleAnimatedButton(this.selectState);
+
+  final ToggleState selectState;
+
+  @override
+  ExampleAnimatedButtonState createState() {
+    return new ExampleAnimatedButtonState();
+  }
+}
+
+class ExampleAnimatedButtonState extends State<ExampleAnimatedButton> with TickerProviderStateMixin<ExampleAnimatedButton> {
+  AnimationController controller;
+
+  @override
+  Widget build(BuildContext context) {
+    final ToggleState toggleState = ToggleController.getSharedValue<ToggleState>(context);
+    final bool isSelected = toggleState == widget.selectState;
+    if (isSelected) {
+      controller.reverse();
+    } else {
+      controller.forward();
+    }
+    final TextStyle textSyle = DefaultTextStyle.of(context).style.copyWith(
+          color: Color.lerp(const Color(0xff000000), const Color(0xffffffff), controller.value),
+        );
+    Widget button = new Container(
+      width: 50.0,
+      height: 50.0,
+      decoration: new ShapeDecoration(
+        shape: const StadiumBorder(),
+        color: Color.lerp(const Color(0xffffffff), const Color(0xff804040), controller.value),
+      ),
+      alignment: Alignment.center,
+      child: new Text(describeEnum(widget.selectState), style: textSyle),
+    );
+
+    button = GestureDetector(
+      onTap: () {
+        ToggleController.setSharedValue<ToggleState>(context, isSelected ? null : widget.selectState);
+      },
+      child: button,
+    );
+    return new Padding(padding: const EdgeInsets.all(8.0), child: button);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    controller = new AnimationController(vsync: this, value: 0.0, duration: const Duration(seconds: 1));
+    controller.addListener(() {
+      setState(() {});
+    });
+  }
+
+  @override
+  void dispose() {
+    controller.dispose();
   }
 }
 

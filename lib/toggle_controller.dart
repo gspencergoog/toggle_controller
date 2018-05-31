@@ -6,14 +6,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 
 class ToggleController<T> extends StatefulWidget {
-  const ToggleController({Key key, this.child, this.initialValue}) : super(key: key);
+  const ToggleController({Key key, this.child, this.initialValue, this.valueChanged}) : super(key: key);
 
   final Widget child;
   final T initialValue;
+  final ValueChanged<T> valueChanged;
 
   static T getSharedValue<T>(BuildContext context) {
     assert(context != null);
     final _ToggleControllerScope controllerScope = context.inheritFromWidgetOfExactType(_ToggleControllerScope);
+    assert(controllerScope != null, 'Unable to find ancestor ToggleController');
     return controllerScope?.value;
   }
 
@@ -39,6 +41,9 @@ class _ToggleControllerState<T> extends State<ToggleController<T>> {
     }
     setState(() {
       _sharedValue = value;
+      if (widget.valueChanged != null) {
+        widget.valueChanged(value);
+      }
     });
   }
 
