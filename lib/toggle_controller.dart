@@ -13,13 +13,15 @@ class ToggleController<T> extends StatefulWidget {
 
   static T getToggleState<T>(BuildContext context) {
     assert(context != null);
-    final Type type = const _ToggleControllerScope<T>._type().runtimeType;
+    // ignore: prefer_const_constructors
+    final Type type = new _ToggleControllerScope<T>._type().runtimeType;
     final _ToggleControllerScope<T> controllerScope = context.inheritFromWidgetOfExactType(type);
     return controllerScope?.value;
   }
 
   static void setToggleState<T>(BuildContext context, T value) {
-    final _ToggleControllerState<T> controllerState = context.ancestorStateOfType(const TypeMatcher<_ToggleControllerState<T>>());
+    // ignore: prefer_const_constructors
+    final _ToggleControllerState<T> controllerState = context.ancestorStateOfType(new TypeMatcher<_ToggleControllerState<T>>());
     assert(controllerState != null);
     controllerState.sharedValue = value;
   }
